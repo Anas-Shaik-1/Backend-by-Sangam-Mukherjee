@@ -36,7 +36,6 @@ const register = async (req, res) => {
             });
         }
     } catch (err) {
-        // console.log(err);
         return res.status(500).json({
             success: false,
             error: err.message,
@@ -89,5 +88,50 @@ const login = async (req, res) => {
         });
     }
 };
+const changePassword = async (req, res) => {
+    try {
+        const { oldPassword, newPassword1, newPassword2 } = req.body;
 
-module.exports = { login, register };
+        const { userId } = req.userInfo;
+
+        const user = await User.findById(userId);
+
+        const isPasswordMatch = await bcrypt.compare(
+            oldPassword,
+            user.password,
+        );
+
+        if (!isPasswordMatch) {
+            return res.status(400).json({
+                success: false,
+                message: "Password is incorrect. Please try again.",
+            });
+        }
+        if (newPassword1 !== newPassword2) {
+            return res.status(400).json({
+                success: false,
+                message: "New Password didn't match. Please try again.",
+            });
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        const newPassword = await bcrypt.hash(newPassword1, salt);
+
+        user.password = newPassword;
+        await user.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Password Changed Successfully",
+        });
+    } catch (err) {
+        // console.log(err);
+        return res.status(500).json({
+            success: false,
+            error: err.message,
+            msg: "Server Error",
+        });
+    }
+};
+
+module.exports = { login, register, changePassword };
