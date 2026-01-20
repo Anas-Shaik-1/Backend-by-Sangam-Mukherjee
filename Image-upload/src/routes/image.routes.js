@@ -6,18 +6,19 @@ const {
     uploadImageController,
     getAllImages,
     deleteImage,
+    fetchImageController,
 } = require("../controllers/image-controller");
 
 const imageRouter = express.Router();
 
 imageRouter.post(
-    "/upload",
+    "/",
     authMiddleware,
     adminMiddleware,
     imageUploadMiddleware.single("image"),
     uploadImageController,
 );
-imageRouter.get("/get", getAllImages);
+imageRouter.get("/", authMiddleware, fetchImageController);
 
 imageRouter.delete("/:id", authMiddleware, adminMiddleware, deleteImage);
 

@@ -71,7 +71,7 @@ const login = async (req, res) => {
             { userId: _id, username, role },
             process.env.JWT_SECRET,
             {
-                expiresIn: "15min",
+                expiresIn: "60min",
             },
         );
         res.status(200).json({
